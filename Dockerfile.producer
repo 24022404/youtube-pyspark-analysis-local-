@@ -1,0 +1,18 @@
+FROM python:3.10-slim
+
+WORKDIR /app
+
+# Install dependencies
+COPY requirements-producer.txt .
+RUN pip install --no-cache-dir -r requirements-producer.txt
+
+# Copy source code
+COPY config.py .
+COPY kafka_producer.py .
+
+# Create .env file placeholder
+ENV YOUTUBE_API_KEY=""
+ENV KAFKA_BOOTSTRAP_SERVERS="kafka:9092"
+
+# Run producer
+CMD ["python", "kafka_producer.py", "--mode", "continuous"]
