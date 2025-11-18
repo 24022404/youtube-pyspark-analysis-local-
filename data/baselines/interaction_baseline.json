@@ -1,0 +1,106 @@
+{
+  "timestamp": "2025-11-18T10:34:16.564284",
+  "analysis_type": "interaction_analysis",
+  "top_performers": {
+    "by_views": {
+      "top_10_titles": [
+        "Discord Loot Boxes are here.",
+        "BLACKPINK - ‘Pink Venom’ M/V",
+        "BTS (방탄소년단) 'Butter' Official MV",
+        "BTS (방탄소년단) 'Dynamite' Official MV",
+        "Turn into orbeez - Tutorial #Shorts",
+        "BLACKPINK - 'Ice Cream (with Selena Gomez)' M/V",
+        "BLACKPINK - ‘Shut Down’ M/V",
+        "JISOO - ‘꽃(FLOWER)’ M/V",
+        "Face Your Biggest Fear To Win $800,000",
+        "Grand Theft Auto VI Trailer 1"
+      ],
+      "top_10_values": [
+        1407643634,
+        277791741,
+        264407389,
+        232649205,
+        206202284,
+        184778248,
+        180654898,
+        170333822,
+        169649341,
+        166323421
+      ],
+      "median_views": 164043024,
+      "top_1_percent_threshold": 1192971774
+    },
+    "by_likes": {
+      "top_10_titles": [
+        "BTS (방탄소년단) 'Butter' Official MV",
+        "BTS (방탄소년단) 'Dynamite' Official MV",
+        "BLACKPINK - ‘Pink Venom’ M/V",
+        "BTS (방탄소년단) 'Permission to Dance' Official MV",
+        "BLACKPINK - 'Ice Cream (with Selena Gomez)' M/V",
+        "BTS (방탄소년단) 'Life Goes On' Official MV",
+        "LISA - 'LALISA' M/V",
+        "Grand Theft Auto VI Trailer 1",
+        "$456,000 Squid Game In Real Life!",
+        "BTS (방탄소년단) 'Yet To Come (The Most Beautiful Moment)' Official MV"
+      ],
+      "top_10_values": [
+        16021534,
+        15735533,
+        12993894,
+        12117314,
+        11795670,
+        11405030,
+        11348978,
+        11192833,
+        10926910,
+        9444379
+      ],
+      "median_likes": 9331127
+    },
+    "by_comments": {
+      "top_10_titles": [
+        "BTS (방탄소년단) 'Butter' Official MV",
+        "BTS (방탄소년단) 'Dynamite' Official MV",
+        "BTS (방탄소년단) 'Life Goes On' Official MV",
+        "BLACKPINK - ‘Pink Venom’ M/V",
+        "GAME  (Full Video)  Shooter Kahlon | Sidhu Moose Wala | Hunny PK Films | Gold Media | 5911 Records",
+        "EXO 엑소 'Don't fight the feeling' MV",
+        "BTS (방탄소년단) 'Permission to Dance' Official MV",
+        "BLACKPINK - 'Ice Cream (with Selena Gomez)' M/V",
+        "BTS (방탄소년단) 'Yet To Come (The Most Beautiful Moment)' Official MV",
+        "LISA - 'LALISA' M/V"
+      ],
+      "top_10_values": [
+        6738537,
+        6065230,
+        4160903,
+        3534337,
+        3431431,
+        2857602,
+        2781218,
+        2735997,
+        2469783,
+        2402692
+      ],
+      "median_comments": 2261320
+    }
+  },
+  "engagement_benchmarks": {
+    "avg_like_rate": 4.730285522934014,
+    "avg_comment_rate": 0.36575484332123004,
+    "avg_engagement_rate": 5.136972375720458,
+    "top_10_percent_engagement": 0
+  },
+  "thresholds": {
+    "viral_view_threshold": 334284335,
+    "high_engagement_threshold": 5.0,
+    "low_engagement_threshold": 1.0
+  },
+  "statistics": {
+    "total_views": 0,
+    "total_likes": 0,
+    "total_comments": 0,
+    "avg_views_per_video": 0,
+    "avg_likes_per_video": 0
+  }
+}

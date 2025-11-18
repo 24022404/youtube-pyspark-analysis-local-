@@ -1,0 +1,88 @@
+{
+  "timestamp": "2025-11-18T10:15:05.294248",
+  "analysis_type": "time_analysis",
+  "hourly_distribution": {
+    "video_count_by_hour": {
+      "0": 11358,
+      "1": 8889,
+      "2": 6795,
+      "3": 6681,
+      "4": 12765,
+      "5": 7131,
+      "6": 2776,
+      "7": 2169,
+      "8": 2526,
+      "9": 3368,
+      "10": 2748,
+      "11": 3675,
+      "12": 6757,
+      "13": 11716,
+      "14": 17288,
+      "15": 21867,
+      "16": 25490,
+      "17": 23588,
+      "18": 17348,
+      "19": 17031,
+      "20": 16238,
+      "21": 14767,
+      "22": 14134,
+      "23": 11682
+    },
+    "peak_hours": [
+      16,
+      17,
+      15
+    ],
+    "low_hours": [
+      7,
+      8,
+      10
+    ]
+  },
+  "daily_distribution": {
+    "video_count_by_day": {
+      "Mon": 38406,
+      "Tue": 39614,
+      "Wed": 38504,
+      "Thu": 36024,
+      "Fri": 44575,
+      "Sat": 34892,
+      "Sun": 36772
+    },
+    "peak_days": [
+      "Fri",
+      "Tue",
+      "Wed"
+    ],
+    "low_days": [
+      "Sat",
+      "Thu",
+      "Sun"
+    ]
+  },
+  "trending_distribution": {
+    "video_count_by_trending_day": {
+      "Mon": 38998,
+      "Tue": 38596,
+      "Wed": 38600,
+      "Thu": 38800,
+      "Fri": 38398,
+      "Sat": 37797,
+      "Sun": 37598
+    }
+  },
+  "time_to_trend": {
+    "avg_days": 1.4861482329981757,
+    "median_days": 1,
+    "min_days": 0,
+    "max_days": 30,
+    "same_day_percentage": 2.6070170972805564
+  },
+  "statistics": {
+    "most_active_hour": 16,
+    "least_active_hour": 7,
+    "most_active_day": "Fri",
+    "avg_videos_per_hour": 11199.458333333334,
+    "avg_videos_per_day": 38398.142857142855
+  }
+}
