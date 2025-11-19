@@ -1,18 +1,25 @@
-Mục đích dự án:
-Xây dựng hệ thống phân tích YouTube trending videos real-time với dự đoán AI cho ngày mai.
-Các file gốc làm gì:
 
-File 01: Tiền xử lý data (cleaning, chuẩn hóa)
-File 02-04: Phân tích baseline (category, time patterns, engagement) → dùng làm ground 
-truth để huấn luyện mô hình Random Forest + Prophet
-File 05: Real-time monitoring (cơ sở cho Kafka producer)
+File 02-05: Học cách phân tích (category, time, engagement) → Áp dụng logic này vào real-time
+preprocessed_data.csv: Dùng để huấn luyện mô hình dự đoán
+Baseline KHÔNG dùng để compare vì data cũ (2020-2024)
 
-Kiến trúc:
+Vậy kiến trúc thực tế:
+File 07 (PySpark Streaming) sẽ:
 
-Kafka: Message queue để stream data từ YouTube API
-PySpark Streaming: Xử lý real-time + phân tích + dự đoán
-MongoDB: Lưu kết quả phân tích + predictions
-Flask + Chart.js: Dashboard hiển thị biểu đồ real-time
+Đọc data từ Kafka (real-time)
+Huấn luyện mô hình trên preprocessed_data.csv (1 lần khi khởi động)
+Phân tích real-time theo logic từ file 02-05:
 
-Dự đoán ngày mai: Dùng Random Forest (views, engagement) + Prophet (time series) - 
-đã được train từ baseline data (file 02-04).
+Category distribution
+Time patterns (giờ nào trending)
+Engagement rate
+
+
+Dự đoán views/likes ngày mai cho video mới
+Lưu MongoDB
+
+File 08 (Web Dashboard):
+
+Hiển thị phân tích real-time
+Hiển thị dự đoán
+Chart tương tự file 02-05 nhưng với data real-time
