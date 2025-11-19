@@ -14,3 +14,11 @@ Terminal 4:
 cd C:\Users\ducmi\OneDrive\Desktop\(21-11)KyThuatVaCongNgheDuLieuLonChoTTNT\Bài tập lớn\youtube-pyspark-analysis-local-
 python 07_realtime_analysis.py
 
+Terminal 5:
+cd C:\Users\ducmi\OneDrive\Desktop\(21-11)KyThuatVaCongNgheDuLieuLonChoTTNT\Bài tập lớn\youtube-pyspark-analysis-local-
+python 09_api_server.py
+
+
+http://localhost:5000/api/health
+http://localhost:5000/api/realtime
+http://localhost:5000/api/predictions

@@ -190,6 +190,9 @@ try:
                     predictions_list.append(pred)
                 
                 df_pd['predicted_views_tomorrow'] = predictions_list
+
+                if 'categoryId' not in df_pd.columns:
+                    df_pd['categoryId'] = '24' 
                 
                 print(f"\n🔮 PREDICTIONS:")
                 print(f"   Avg predicted views tomorrow: {df_pd['predicted_views_tomorrow'].mean():,.0f}")
@@ -216,6 +219,7 @@ try:
                         for key, value in list(doc.items()):  # FIX: items() thay vì iteritems()
                             if pd.isna(value):
                                 doc[key] = None
+                        doc['processing_timestamp'] = datetime.now() 
                     
                     realtime_col.insert_many(realtime_docs)
                     
@@ -228,12 +232,18 @@ try:
                     category_col.insert_many(category_docs)
                     
                     # Predictions
+                    predictions_col.delete_many({}) 
                     pred_docs = df_pd.nlargest(10, 'predicted_views_tomorrow')[
-                        ['video_id', 'title', 'predicted_views_tomorrow', 'view_count']
+                        ['video_id', 'title', 'categoryId', 'predicted_views_tomorrow', 'view_count']
                     ].to_dict('records')
                     for doc in pred_docs:
                         doc['timestamp'] = datetime.now()
+                        if 'title' not in doc or doc['title'] is None:
+                            doc['title'] = 'Unknown Title'
+                        if 'categoryId' not in doc or doc['categoryId'] is None:
+                            doc['categoryId'] = '24'
                     predictions_col.insert_many(pred_docs)
+                    
                     
                     print(f"\n💾 Saved to MongoDB: {len(realtime_docs)} records")
                 
