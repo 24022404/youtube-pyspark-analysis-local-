@@ -1,0 +1,16 @@
+Terminal 1:
+cd C:\kafka\kafka_2.13-3.3.2
+bin\windows\zookeeper-server-start.bat config\zookeeper.properties
+
+Terminal 2:
+cd C:\kafka\kafka_2.13-3.3.2
+bin\windows\kafka-server-start.bat config\server.properties
+
+Terminal 3:
+cd C:\Users\ducmi\OneDrive\Desktop\(21-11)KyThuatVaCongNgheDuLieuLonChoTTNT\Bài tập lớn\youtube-pyspark-analysis-local-
+python 06_kafka_producer.py
+
+Terminal 4:
+cd C:\Users\ducmi\OneDrive\Desktop\(21-11)KyThuatVaCongNgheDuLieuLonChoTTNT\Bài tập lớn\youtube-pyspark-analysis-local-
+python 07_realtime_analysis.py
+
