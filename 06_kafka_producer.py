@@ -1,182 +1,143 @@
 """
 06_kafka_producer.py
-Kafka Producer - Stream YouTube trending data vào Kafka topic
+Kafka Producer - CRAWL REAL-TIME từ YouTube API
 """
 
 from kafka import KafkaProducer
+from googleapiclient.discovery import build
 import json
 import time
-import pandas as pd
 from datetime import datetime
 import logging
 
-# Setup logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
+# YOUTUBE API KEY
+API_KEY = 'AIzaSyBHZ-BVjZUVWMxhJfJ3k85PdQh12Hyf70k'
+
 class YouTubeKafkaProducer:
-    def __init__(self, 
-                 bootstrap_servers='localhost:9092',
-                 topic='youtube-trending',
-                 csv_file='./data/raw_data.csv'):
-        """
-        Khởi tạo Kafka Producer
-        
-        Args:
-            bootstrap_servers: Kafka server address
-            topic: Kafka topic name
-            csv_file: Đường dẫn file CSV chứa data
-        """
+    def __init__(self, bootstrap_servers='localhost:9092', topic='youtube-trending'):
         self.topic = topic
-        self.csv_file = csv_file
         
-        # Khởi tạo Kafka Producer
+        # Kafka Producer
         try:
             self.producer = KafkaProducer(
                 bootstrap_servers=bootstrap_servers,
                 value_serializer=lambda v: json.dumps(v).encode('utf-8'),
-                acks='all',  # Đảm bảo message được ghi thành công
-                retries=3,
-                max_in_flight_requests_per_connection=1
+                acks='all',
+                retries=3
             )
-            logger.info(f"✅ Kafka Producer đã kết nối đến {bootstrap_servers}")
+            logger.info(f"✅ Kafka Producer connected to {bootstrap_servers}")
         except Exception as e:
-            logger.error(f"❌ Không thể kết nối Kafka: {e}")
+            logger.error(f"❌ Cannot connect to Kafka: {e}")
             raise
-    
-    def load_data(self):
-        """Load data từ CSV"""
+        
+        # YouTube API
         try:
-            df = pd.read_csv(self.csv_file)
-            logger.info(f"📊 Đã load {len(df):,} videos từ {self.csv_file}")
-            return df
+            self.youtube = build('youtube', 'v3', developerKey=API_KEY)
+            logger.info("✅ YouTube API initialized")
         except Exception as e:
-            logger.error(f"❌ Lỗi khi đọc CSV: {e}")
+            logger.error(f"❌ Cannot initialize YouTube API: {e}")
             raise
     
-    def prepare_message(self, row):
-        """
-        Chuẩn bị message để gửi vào Kafka
-        
-        Args:
-            row: Pandas Series (1 dòng từ DataFrame)
-        Returns:
-            dict: Message dạng JSON
-        """
-        return {
-            'video_id': str(row['video_id']),
-            'title': str(row['title']),
-            'publishedAt': str(row['publishedAt']),
-            'channelId': str(row['channelId']),
-            'channelTitle': str(row['channelTitle']),
-            'categoryId': int(row['categoryId']),
-            'trending_date': str(row['trending_date']),
-            'tags': str(row['tags']) if pd.notna(row['tags']) else '',
-            'view_count': int(row['view_count']),
-            'likes': int(row['likes']),
-            'dislikes': int(row['dislikes']),
-            'comment_count': int(row['comment_count']),
-            'thumbnail_link': str(row['thumbnail_link']),
-            'comments_disabled': bool(row['comments_disabled']),
-            'ratings_disabled': bool(row['ratings_disabled']),
-            'description': str(row['description']) if pd.notna(row['description']) else '',
-            'kafka_timestamp': datetime.now().isoformat()
-        }
+    def crawl_trending_videos(self, region_code='US', max_results=50):
+        """Crawl trending videos từ YouTube"""
+        try:
+            request = self.youtube.videos().list(
+                part='snippet,statistics',
+                chart='mostPopular',
+                regionCode=region_code,
+                maxResults=max_results
+            )
+            response = request.execute()
+            
+            videos = []
+            trending_date = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+            
+            for item in response['items']:
+                snippet = item['snippet']
+                stats = item['statistics']
+                
+                video = {
+                    'video_id': item['id'],
+                    'title': snippet['title'],
+                    'publishedAt': snippet['publishedAt'],
+                    'channelId': snippet['channelId'],
+                    'channelTitle': snippet['channelTitle'],
+                    'categoryId': int(snippet['categoryId']),
+                    'trending_date': trending_date,
+                    'tags': '|'.join(snippet.get('tags', [])),
+                    'view_count': int(stats.get('viewCount', 0)),
+                    'likes': int(stats.get('likeCount', 0)),
+                    'dislikes': 0,
+                    'comment_count': int(stats.get('commentCount', 0)),
+                    'thumbnail_link': snippet['thumbnails']['default']['url'],
+                    'comments_disabled': 'commentCount' not in stats,
+                    'ratings_disabled': False,
+                    'description': snippet['description'],
+                    'kafka_timestamp': datetime.now().isoformat()
+                }
+                videos.append(video)
+            
+            logger.info(f"📊 Crawled {len(videos)} trending videos")
+            return videos
+            
+        except Exception as e:
+            logger.error(f"❌ Error crawling YouTube: {e}")
+            return []
     
-    def stream_data(self, batch_size=10, delay=2):
+    def stream_realtime(self, interval=600, batch_size=10):
         """
-        Stream data theo batch vào Kafka
+        Stream real-time data từ YouTube
         
         Args:
-            batch_size: Số message mỗi batch
-            delay: Thời gian delay giữa các batch (giây)
+            interval: Thời gian giữa các lần crawl (giây) - Mặc định 10 phút
+            batch_size: Số video gửi mỗi lần
         """
-        df = self.load_data()
-        total_records = len(df)
-        sent_count = 0
-        
-        logger.info(f"🚀 Bắt đầu streaming {total_records:,} videos...")
+        logger.info(f"🚀 REAL-TIME STREAMING STARTED")
+        logger.info(f"   Crawl interval: {interval}s ({interval/60:.0f} minutes)")
         logger.info(f"   Batch size: {batch_size}")
-        logger.info(f"   Delay: {delay}s")
+        
+        count = 0
         
         try:
-            for idx, row in df.iterrows():
-                # Chuẩn bị message
-                message = self.prepare_message(row)
-                
-                # Gửi vào Kafka
-                future = self.producer.send(self.topic, value=message)
-                
-                # Đợi xác nhận (tùy chọn)
-                try:
-                    record_metadata = future.get(timeout=10)
-                    sent_count += 1
-                    
-                    # Log mỗi batch
-                    if sent_count % batch_size == 0:
-                        logger.info(
-                            f"📤 Đã gửi {sent_count}/{total_records} videos "
-                            f"({sent_count/total_records*100:.1f}%) | "
-                            f"Topic: {record_metadata.topic} | "
-                            f"Partition: {record_metadata.partition}"
-                        )
-                        time.sleep(delay)
-                
-                except Exception as e:
-                    logger.error(f"❌ Lỗi khi gửi video {message['video_id']}: {e}")
-            
-            # Đảm bảo tất cả message được gửi
-            self.producer.flush()
-            logger.info(f"✅ HOÀN THÀNH! Đã gửi {sent_count}/{total_records} videos")
-            
-        except KeyboardInterrupt:
-            logger.warning(f"⚠️ Dừng streaming! Đã gửi {sent_count}/{total_records} videos")
-        except Exception as e:
-            logger.error(f"❌ Lỗi khi streaming: {e}")
-        finally:
-            self.close()
-    
-    def stream_realtime_simulation(self, interval=5):
-        """
-        Giả lập streaming real-time (gửi data mới nhất liên tục)
-        
-        Args:
-            interval: Thời gian delay giữa các message (giây)
-        """
-        df = self.load_data()
-        
-        # Lấy 50 videos mới nhất
-        df_recent = df.tail(50)
-        
-        logger.info(f"🔄 Bắt đầu real-time simulation với {len(df_recent)} videos")
-        logger.info(f"   Interval: {interval}s")
-        
-        try:
-            count = 0
             while True:
-                # Lặp qua các video
-                for idx, row in df_recent.iterrows():
-                    message = self.prepare_message(row)
+                # Crawl YouTube
+                videos = self.crawl_trending_videos(max_results=50)
+                
+                if not videos:
+                    logger.warning("⚠️ No videos crawled, retrying in 60s...")
+                    time.sleep(60)
+                    continue
+                
+                # Gửi vào Kafka theo batch
+                for i, video in enumerate(videos):
+                    try:
+                        future = self.producer.send(self.topic, value=video)
+                        future.get(timeout=10)
+                        count += 1
+                        
+                        # Log mỗi batch
+                        if (i + 1) % batch_size == 0:
+                            logger.info(
+                                f"📤 Sent {i+1}/{len(videos)} videos | "
+                                f"Total: {count} | "
+                                f"Latest: {video['title'][:40]}..."
+                            )
                     
-                    # Update timestamp mới
-                    message['kafka_timestamp'] = datetime.now().isoformat()
-                    
-                    # Gửi vào Kafka
-                    self.producer.send(self.topic, value=message)
-                    count += 1
-                    
-                    logger.info(
-                        f"📡 [{count}] Sent: {message['title'][:50]}... | "
-                        f"Views: {message['view_count']:,}"
-                    )
-                    
-                    time.sleep(interval)
+                    except Exception as e:
+                        logger.error(f"❌ Error sending video: {e}")
+                
+                self.producer.flush()
+                logger.info(f"✅ Batch completed! Total sent: {count} videos")
+                logger.info(f"⏳ Waiting {interval}s until next crawl...")
+                time.sleep(interval)
         
         except KeyboardInterrupt:
-            logger.warning(f"⚠️ Dừng simulation! Đã gửi {count} messages")
+            logger.warning(f"⚠️ Stopped! Total sent: {count} videos")
+        except Exception as e:
+            logger.error(f"❌ Error: {e}")
         finally:
             self.close()
     
@@ -184,40 +145,21 @@ class YouTubeKafkaProducer:
         """Đóng Kafka Producer"""
         if self.producer:
             self.producer.close()
-            logger.info("👋 Đã đóng Kafka Producer")
+            logger.info("👋 Kafka Producer closed")
 
 
 def main():
-    """Main function"""
-    print("=" * 60)
-    print("KAFKA PRODUCER - YOUTUBE TRENDING DATA")
-    print("=" * 60)
+    print("=" * 70)
+    print("KAFKA PRODUCER - YOUTUBE REAL-TIME CRAWLER")
+    print("=" * 70)
     
-    # Khởi tạo producer
     producer = YouTubeKafkaProducer(
         bootstrap_servers='localhost:9092',
-        topic='youtube-trending',
-        csv_file='./data/raw_data.csv'
+        topic='youtube-trending'
     )
     
-    # Menu lựa chọn
-    print("\n📋 Chọn chế độ streaming:")
-    print("   1. Batch streaming (gửi tất cả data)")
-    print("   2. Real-time simulation (lặp liên tục)")
-    
-    choice = input("\nNhập lựa chọn (1 hoặc 2): ").strip()
-    
-    if choice == '1':
-        batch_size = int(input("Batch size (mặc định 10): ") or 10)
-        delay = float(input("Delay giữa các batch (giây, mặc định 2): ") or 2)
-        producer.stream_data(batch_size=batch_size, delay=delay)
-    
-    elif choice == '2':
-        interval = float(input("Interval giữa messages (giây, mặc định 5): ") or 5)
-        producer.stream_realtime_simulation(interval=interval)
-    
-    else:
-        print("❌ Lựa chọn không hợp lệ!")
+    # Stream real-time với crawl mỗi 10 phút
+    producer.stream_realtime(interval=600, batch_size=10)
 
 
 if __name__ == "__main__":

@@ -219,7 +219,7 @@ try:
                         for key, value in list(doc.items()):  # FIX: items() thay vì iteritems()
                             if pd.isna(value):
                                 doc[key] = None
-                        doc['processing_timestamp'] = datetime.now() 
+                        doc['processing_timestamp'] = datetime.now().isoformat() 
                     
                     realtime_col.insert_many(realtime_docs)
                     

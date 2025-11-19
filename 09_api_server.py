@@ -35,7 +35,7 @@ def get_realtime_data():
         data = list(db.realtime_data.find(
             {},
             {'_id': 0}  # Không trả về _id
-        ).sort('timestamp', -1).limit(100))
+        ).sort('processing_timestamp', -1).limit(100))
         
         print(f"📤 Sent {len(data)} videos to dashboard")
         return jsonify(data)
