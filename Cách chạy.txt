@@ -1,22 +1,23 @@
-Terminal 1:
+Terminal 1: (Ae tự sửa phần này theo cấu trúc của máy mình nhé)
 cd C:\kafka\kafka_2.13-3.3.2
 bin\windows\zookeeper-server-start.bat config\zookeeper.properties
 
-Terminal 2:
+Terminal 2: (Ae tự sửa phần này theo cấu trúc của máy mình nhé)
 cd C:\kafka\kafka_2.13-3.3.2
 bin\windows\kafka-server-start.bat config\server.properties
 
-Terminal 3:
+Terminal 3: (Ae tự sửa phần này theo cấu trúc của máy mình nhé)
 cd C:\Users\ducmi\OneDrive\Desktop\(21-11)KyThuatVaCongNgheDuLieuLonChoTTNT\Bài tập lớn\youtube-pyspark-analysis-local-
 python 06_kafka_producer.py
 
-Terminal 4:
+Terminal 4: (Ae tự sửa phần này theo cấu trúc của máy mình nhé)
 cd C:\Users\ducmi\OneDrive\Desktop\(21-11)KyThuatVaCongNgheDuLieuLonChoTTNT\Bài tập lớn\youtube-pyspark-analysis-local-
 python 07_realtime_analysis.py
 
-Terminal 5:
+Terminal 5: (Ae tự sửa phần này theo cấu trúc của máy mình nhé)
 cd C:\Users\ducmi\OneDrive\Desktop\(21-11)KyThuatVaCongNgheDuLieuLonChoTTNT\Bài tập lớn\youtube-pyspark-analysis-local-
 python 09_api_server.py
+
 
 
 http://localhost:5000/api/health
